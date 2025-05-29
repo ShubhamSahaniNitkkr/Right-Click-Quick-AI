@@ -55,10 +55,31 @@ chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
           color: #666;
           display: none;
         }
+        #text {
+          font-size: 13px;
+          display: block;
+          margin-bottom: 0;
+          margin-top: 10px;
+        }
+        #header-bar{
+          display:flex;
+          justify-content:flex-start;
+          align-items:center;
+          color: #02a9f4;
+          border-bottom: 1px solid gainsboro;
+          padding-bottom: 5px;
+        }
+        #header-image{
+        height:30px
+        }
       </style>
       <button id="quickai-close">❌</button>
       <div>
-        <strong>Prompt + Selection:</strong>
+        <div id="header-bar">
+        <img id="header-image"/>
+        <strong>Right Click Quick AI</strong>
+        </div>
+        <span id="text">Your Selected Text + Prompt :</span>
         <textarea id="finalPrompt" readonly></textarea>
         <div id="loader">⏳ Loading...</div>
         <textarea id="aiResponse" rows="6" readonly></textarea>
@@ -67,6 +88,9 @@ chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
       </div>
     `;
     document.body.appendChild(popup);
+
+    const img = popup.querySelector("img");
+    img.src = chrome.runtime.getURL("icons/icon128.png");
 
     // Close button functionality
     document.getElementById("quickai-close").onclick = () => {

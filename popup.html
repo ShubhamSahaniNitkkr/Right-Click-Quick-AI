@@ -78,11 +78,26 @@
       .note a:hover {
         text-decoration: underline;
       }
+
+      #header-bar {
+        display: flex;
+        align-items: center;
+        color: #02a9f4;
+        border-bottom: 1px solid gainsboro;
+        padding-bottom: 5px;
+        font-size: 18px;
+      }
+
+      #header-image {
+        height: 30px;
+      }
     </style>
   </head>
   <body>
-    <h3>Right Click Quick AI Settings</h3>
-
+    <div id="header-bar">
+      <img id="header-image" src="./icons/icon128.png" />
+      <strong>Right Click Quick AI</strong>
+    </div>
     <label for="apiKey">Gemini API Key:</label>
     <input
       id="apiKey"

@@ -2,10 +2,9 @@ const apiKeyInput = document.getElementById("apiKey");
 const promptInput = document.getElementById("prompt");
 const responseBox = document.getElementById("responseBox");
 
-chrome.storage.sync.get(["apiKey", "prompt", "lastResponse"], (data) => {
+chrome.storage.sync.get(["apiKey", "prompt"], (data) => {
   if (data.apiKey) apiKeyInput.value = data.apiKey;
   if (data.prompt) promptInput.value = data.prompt;
-  if (data.lastResponse) responseBox.value = data.lastResponse;
 });
 
 document.getElementById("saveBtn").onclick = () => {

@@ -1,6 +1,6 @@
 {
   "manifest_version": 3,
-  "name": "QuickClickGPT",
+  "name": "Right Click Quick AI",
   "version": "2.1",
   "description": "Right-click any text to send it to ChatGPT with your custom prompt.",
   "permissions": [
@@ -25,7 +25,7 @@
   ],
   "web_accessible_resources": [
     {
-      "resources": ["style.css"],
+      "resources": ["style.css", "icons/icon128.png"],
       "matches": ["<all_urls>"]
     }
   ],
