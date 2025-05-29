@@ -36,6 +36,19 @@ chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
           font-size: 12px;
           cursor: pointer;
         }
+        #quickai-close {
+          position: absolute;
+          top: 0;
+          right: -5px;
+          font-size: 14px;
+          cursor: pointer;
+          background: none;
+          border: none;
+          color: #999;
+        }
+        #quickai-close:hover {
+          color: red;
+        }
         #loader {
           margin-top: 5px;
           font-size: 14px;
@@ -43,6 +56,7 @@ chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
           display: none;
         }
       </style>
+      <button id="quickai-close">❌</button>
       <div>
         <strong>Prompt + Selection:</strong>
         <textarea id="finalPrompt" readonly></textarea>
@@ -53,6 +67,11 @@ chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
       </div>
     `;
     document.body.appendChild(popup);
+
+    // Close button functionality
+    document.getElementById("quickai-close").onclick = () => {
+      popup.remove();
+    };
 
     async function runAI(text) {
       const loader = document.getElementById("loader");
@@ -79,15 +98,9 @@ chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
               `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`,
               {
                 method: "POST",
-                headers: {
-                  "Content-Type": "application/json",
-                },
+                headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
-                  contents: [
-                    {
-                      parts: [{ text: fullPrompt }],
-                    },
-                  ],
+                  contents: [{ parts: [{ text: fullPrompt }] }],
                 }),
               }
             );
@@ -99,11 +112,7 @@ chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
 
             aiResponse.value = reply;
             loader.style.display = "none";
-
-            // Copy response to clipboard
             navigator.clipboard.writeText(reply);
-
-            // Optionally store last response
             chrome.storage.sync.set({ lastResponse: reply });
           } catch (error) {
             loader.innerText = "❌ Failed to fetch response";
@@ -116,9 +125,13 @@ chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
     runAI(selectedText);
 
     document.getElementById("copyBtn").onclick = () => {
-      navigator.clipboard.writeText(
-        document.getElementById("aiResponse").value
-      );
+      const btn = document.getElementById("copyBtn");
+      const value = document.getElementById("aiResponse").value;
+      navigator.clipboard.writeText(value);
+      btn.textContent = "✅ Copied!";
+      setTimeout(() => {
+        btn.textContent = "📋 Copy";
+      }, 1000);
     };
 
     document.getElementById("retryBtn").onclick = () => {
