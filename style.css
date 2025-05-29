@@ -1,0 +1,28 @@
+#quickai-popup {
+  position: fixed;
+  top: 100px;
+  right: 50px;
+  z-index: 999999;
+  background: white;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+  width: 300px;
+  padding: 10px;
+  font-family: sans-serif;
+}
+
+.quickai-box textarea {
+  width: 100%;
+  margin-top: 5px;
+  padding: 6px;
+  font-size: 12px;
+  font-family: monospace;
+  resize: vertical;
+}
+
+.quickai-box button {
+  margin: 5px 5px 0 0;
+  padding: 6px 10px;
+  font-size: 12px;
+}
