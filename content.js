@@ -109,7 +109,7 @@ chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
         ["apiKey", "prompt"],
         async ({ apiKey, prompt }) => {
           if (!apiKey) {
-            alert("Please set your Gemini API key in the extension popup.");
+            alert("Please set your API key in the extension popup.");
             loader.style.display = "none";
             return;
           }
@@ -118,29 +118,75 @@ chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
           finalPromptBox.value = fullPrompt;
 
           try {
-            const response = await fetch(
-              `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`,
-              {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                  contents: [{ parts: [{ text: fullPrompt }] }],
-                }),
-              }
-            );
+            let reply = "";
 
-            const data = await response.json();
-            const reply =
-              data.candidates?.[0]?.content?.parts?.[0]?.text ||
-              `❌ Error in Gemini response: ${JSON.stringify(data)}`;
+            if (apiKey.startsWith("sk-")) {
+              // OpenAI API Call
+              const response = await fetch(
+                "https://api.openai.com/v1/chat/completions",
+                {
+                  method: "POST",
+                  headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${apiKey}`,
+                  },
+                  body: JSON.stringify({
+                    model: "gpt-3.5-turbo",
+                    messages: [{ role: "user", content: fullPrompt }],
+                    temperature: 0.7,
+                  }),
+                }
+              );
+
+              const data = await response.json();
+
+              if (response.status !== 200 || data.error) {
+                reply = `❌ OpenAI API error: ${
+                  data.error?.message ||
+                  "Maybe your free limit is over or the key is invalid."
+                }`;
+              } else {
+                reply =
+                  data.choices?.[0]?.message?.content ||
+                  "❌ Empty response from OpenAI.";
+              }
+            } else {
+              // Gemini API Call
+              const response = await fetch(
+                `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`,
+                {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({
+                    contents: [{ parts: [{ text: fullPrompt }] }],
+                  }),
+                }
+              );
+
+              const data = await response.json();
+
+              if (response.status !== 200 || data.error) {
+                reply = `❌ Gemini API error: ${
+                  data.error?.message ||
+                  "Maybe your free limit is over or the key is invalid."
+                }`;
+              } else {
+                reply =
+                  data.candidates?.[0]?.content?.parts?.[0]?.text ||
+                  "❌ Empty response from Gemini.";
+              }
+            }
 
             aiResponse.value = reply;
             loader.style.display = "none";
             navigator.clipboard.writeText(reply);
             chrome.storage.sync.set({ lastResponse: reply });
           } catch (error) {
-            loader.innerText = "❌ Failed to fetch response";
-            console.error("Gemini API error:", error);
+            const fallbackMsg =
+              "❌ Network error or API failed. Please check your key or limits.";
+            aiResponse.value = fallbackMsg;
+            loader.innerText = fallbackMsg;
+            console.error("Fetch error:", error);
           }
         }
       );
